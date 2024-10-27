@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Teleop;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -19,6 +20,9 @@ public class FieldCentricMecnaumDrive extends LinearOpMode {
         DcMotor backLeftMotor =  hardwareMap.dcMotor.get("leftRear");
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("rightFront");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("rightRear");
+        DcMotor armMotor = hardwareMap.dcMotor.get("armMotor");
+        CRServo leftServo = hardwareMap.crservo.get("leftServo");
+        CRServo rightServo = hardwareMap.crservo.get("rightServo");
 
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -37,6 +41,8 @@ public class FieldCentricMecnaumDrive extends LinearOpMode {
         waitForStart();
 
         if (isStopRequested()) return;
+
+        double speedFactor = 1.0;
         while (opModeIsActive())  {
 
             double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
@@ -55,17 +61,11 @@ public class FieldCentricMecnaumDrive extends LinearOpMode {
                botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
             }
 
-
-            if (gamepad1.dpad_up){
-                up = 0.5;
-            } if (gamepad1.dpad_right){
-                x = 0.5;
-            } if (gamepad1.dpad_left){
-                x = -0.5;
-            } if (gamepad1.dpad_down){
-                up = -0.5;
+            if (gamepad1.dpad_left && speedFactor > 0.1){
+                speedFactor -= 0.1;
+            } if (gamepad1.dpad_right && speedFactor < 1.0) {
+                speedFactor += 0.1;
             }
-
 
             double rotX = x * Math.cos(-botHeading) - up * Math.sin(-botHeading);
             double rotY = x * Math.sin(-botHeading) + up * Math.cos(-botHeading);
@@ -75,10 +75,19 @@ public class FieldCentricMecnaumDrive extends LinearOpMode {
             double backLeftPower = ((rotY - rotX + rx) / denominator);
             double frontRightPower = ((rotY - rotX - rx) / denominator);
             double backRightPower = ((rotY + rotX - rx) / denominator);
-            frontLeftMotor.setPower(frontLeftPower);
-            backLeftMotor.setPower(backLeftPower);
-            frontRightMotor.setPower(frontRightPower);
-            backRightMotor.setPower(backRightPower);
+
+            frontLeftMotor.setPower(frontLeftPower * speedFactor);
+            backLeftMotor.setPower(backLeftPower * speedFactor);
+            frontRightMotor.setPower(frontRightPower * speedFactor);
+            backRightMotor.setPower(backRightPower * speedFactor);
+
+            if(gamepad1.a){
+
+            }
+
+            leftServo.setPower(0);
+            rightServo.setPower(0);
+
 
             if (botHeading == 0.0){
                 telemetry.addLine("Reset IMU");
