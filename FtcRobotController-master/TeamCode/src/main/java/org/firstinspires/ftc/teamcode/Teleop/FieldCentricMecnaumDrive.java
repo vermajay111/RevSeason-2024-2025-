@@ -20,9 +20,6 @@ public class FieldCentricMecnaumDrive extends LinearOpMode {
         DcMotor backLeftMotor =  hardwareMap.dcMotor.get("leftRear");
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("rightFront");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("rightRear");
-        DcMotor armMotor = hardwareMap.dcMotor.get("armMotor");
-        CRServo leftServo = hardwareMap.crservo.get("leftServo");
-        CRServo rightServo = hardwareMap.crservo.get("rightServo");
 
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -80,18 +77,7 @@ public class FieldCentricMecnaumDrive extends LinearOpMode {
             backLeftMotor.setPower(backLeftPower * speedFactor);
             frontRightMotor.setPower(frontRightPower * speedFactor);
             backRightMotor.setPower(backRightPower * speedFactor);
-
-            if(gamepad1.a){
-
-            }
-
-            leftServo.setPower(0);
-            rightServo.setPower(0);
-
-
-            if (botHeading == 0.0){
-                telemetry.addLine("Reset IMU");
-            }
+            
             telemetry.update();
 
         }
